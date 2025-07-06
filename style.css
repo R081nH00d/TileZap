@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Delius+Unicase:wght@400;700&display=swap');
+
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#experience{
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+#experinece-canvas{
+  width: 100%;
+  height: 100%;
+}
+
+canvas {
+  pointer-events: auto; /* or none, depending on your interactivity */
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#restart {
+  background-color: #c217e8;
+  border-radius: 100px;
+  border-style:dashed;
+  border-width: 2px;
+  box-shadow: rgba(187, 14, 156, 0.519) 0 -25px 30px -30px ,rgba(200, 32, 180, 0.596) 0 1px 1px,rgba(185, 23, 171, 0.667) 0 2px 1px,rgba(171, 25, 149, 0.651) 0 2px 8px,rgba(161, 15, 139, 0.711) 0 8px 16px,rgba(171, 15, 185, 0.716) 0 16px 32px;
+  color: green;
+  cursor: pointer;
+  display: inline-block;
+  height: 110px;
+  width: 110px;
+  padding: 7px 20px;
+  transition: all 250ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  z-index: 10;
+  position: fixed;
+  top: 80px;
+  left: 1350px;
+}
+
+#restart:hover {
+  transform: scale(1.1) rotate(15deg);
+}
+
+#restart:active{
+  transform: scale(0.95) rotate(-15deg);
+}
+
+#next{
+  position: fixed;
+  height: 110px;
+  width: 200px;
+  background: #686D76;
+  top:590px;
+  left: 1295px;
+  border-radius: 50px;
+  z-index: 10;
+  border-style:dashed;
+  border-width: 2px;
+  box-shadow: rgba(131, 125, 130, 0.519) 0 -25px 30px -15px ,rgba(134, 130, 133, 0.596) 0 1px 25px,rgba(117, 113, 117, 0.667) 0 2px 25px,rgba(130, 126, 129, 0.651) 0 2px 8px,rgba(131, 127, 130, 0.711) 0 8px 16px,rgba(122, 119, 123, 0.716) 0 16px 32px;
+  font-size: 44px;
+  color: #B7B7B7;
+  transform: translateX(-50%);
+  opacity: 0.8;
+  transition: all 0.4s ease;
+}
+
+#next.arrow {
+  stroke: currentColor;
+  transition: stroke 0.4s ease;
+}
+
+#next.active {
+  background-color: #c217e8;
+  transform: translateX(-50%) scale(1.1);
+  cursor: pointer;
+  box-shadow: rgba(187, 14, 156, 0.519) 0 -25px 30px -30px ,rgba(200, 32, 180, 0.596) 0 1px 1px,rgba(185, 23, 171, 0.667) 0 2px 1px,rgba(171, 25, 149, 0.651) 0 2px 8px,rgba(161, 15, 139, 0.711) 0 8px 16px,rgba(171, 15, 185, 0.716) 0 16px 32px;
+  opacity: 1;
+  color: black;
+  transform: translateX(1%);
+}
+
+.delius-unicase-regular {
+  font-family: "Delius Unicase", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.delius-unicase-bold {
+  font-family: "Delius Unicase", cursive;
+  font-weight: 200;
+  font-style: normal;
+}
+
+#levelComplete {
+  position: absolute;
+  top: 15%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  padding: 20px 40px;
+  color: rgba(98, 9, 103, 0.985);
+  font-size: 60px;
+  font-weight: 40px;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 100;
+  background: linear-gradient(90deg, #5a0451, #dc26ca, #c806d5);
+  background-clip:text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 15px rgba(177, 11, 228, 0.836);
+}
+
+#levelComplete.show {
+  opacity: 1;
+}
+
+#tut-video {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 250px;
+  border-radius: 10px;
+  z-index: 10;
+  opacity: 0.95;
+  pointer-events: none; /* Prevents mouse interaction */
+}
+#border,
+.tut-border{
+    position: absolute;
+    height: 153px;
+    width: 263px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius:10px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 25px 45px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.768);
+    border-right: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    left: 24px;
+    top: 15px;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    color: rgb(238, 233, 239);
+    font-size: 20px;
+    text-align:left;
+}
+
+#tut-text{
+  padding: 20px 20px; 
+}
+
+#border{
+  opacity: 0;
+}
+#border.show{
+  opacity: 1;
+}

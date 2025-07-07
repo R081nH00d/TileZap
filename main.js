@@ -10,7 +10,7 @@ const tutSteps=[
   "5. If got stuck click restart and continue again",
 ];
 
-
+let currentLevel=0;
 let currentStep=-1;
 const tut_text=document.getElementById("tut-text");
 
@@ -42,7 +42,8 @@ scene.add(character.group);
 const pointer = new THREE.Vector2();
 const intersectObjects=[];
 const intersectObjectsNames=[];
-const goalTiles=[];
+const goalTiles=[
+];
 const platformTiles=[];
 
 renderer.setSize( sizes.width, sizes.height );
@@ -60,9 +61,9 @@ camera.position.y =8.4372715754375;
 camera.position.z =9.358217661513395;
 const loader = new GLTFLoader();
 
-function loadModel(){
+function loadModel(levelNumber){
   
-  loader.load( './levels/stackend.glb', function ( gltf ) {
+  loader.load( `./levels/Level${levelNumber}.glb`, function ( gltf ) {
     
     gltf.scene.traverse((child)=>{
       if(intersectObjectsNames.includes(child.name)){
@@ -183,8 +184,9 @@ function resetLevel() {
   e.classList.remove('show');
   const nextBtn=document.getElementById("next");
   nextBtn.classList.remove("active");
+  nextBtn.removeEventListener("click", handleNextClick);
 
-  loadModel();
+  loadModel(currentLevel);
 }
 
 
@@ -268,47 +270,65 @@ function isAdjacent(tile) {
 }
 
 function checkIfOnGoalTile() {
-  const groupedBlocks = character.group.children.filter(obj => obj.isMesh);
+  const allBlocks = [character.instance, character.block001, character.block002];
 
-  const matchedGoals = new Set();
+  const notGrouped = allBlocks.filter(b => b && b.parent !== character.group);
+  if (notGrouped.length > 0) {
+    console.log(" Not all blocks are merged");
+    return;
+  }
 
-  for (const block of groupedBlocks) {
+  const placedBlocks = allBlocks.filter(b => b && b.parent === character.group);
+  console.log(" Checking", placedBlocks.length, "placed blocks...");
+
+  let matchedGoals = 0;
+
+  for (const block of placedBlocks) {
     const blockPos = new THREE.Vector3();
     block.getWorldPosition(blockPos);
+
+    const blockRounded = {
+      x: Math.round(blockPos.x * 10) / 10,
+      z: Math.round(blockPos.z * 10) / 10
+    };
+
+    console.log("Block Rounded Pos:", blockRounded);
 
     let matched = false;
 
     for (const goal of goalTiles) {
-      if (!(goal instanceof THREE.Object3D) || matchedGoals.has(goal)) continue;
-
       const goalBox = new THREE.Box3().setFromObject(goal);
       const goalCenter = new THREE.Vector3();
       goalBox.getCenter(goalCenter);
 
-      const dx = Math.abs(blockPos.x - goalCenter.x);
-      const dz = Math.abs(blockPos.z - goalCenter.z);
-      const dy = Math.abs(blockPos.y - goalCenter.y);
+      const goalRounded = {
+        x: Math.round(goalCenter.x * 10) / 10,
+        z: Math.round(goalCenter.z * 10) / 10
+      };
 
-      const isMatch = dx < 0.2 && dz < 0.2 && dy < 0.6;
-
-      if (isMatch) {
-        matchedGoals.add(goal);
+      if (
+        Math.abs(blockRounded.x - goalRounded.x) < 0.1 &&
+        Math.abs(blockRounded.z - goalRounded.z) < 0.1
+      ) {
         matched = true;
         break;
       }
     }
 
-    if (!matched) {
-    
-      console.log("Not all blocks on goal tiles");
-      return;
-    }
+    if (matched) matchedGoals++;
   }
 
-  console.log("All blocks on goal tiles Level Passed!");
-  showLevelComplete();
-  triggerLevelComplete();
+  console.log("Matched Goals:", matchedGoals, "/", placedBlocks.length);
+
+  if (matchedGoals === placedBlocks.length) {
+    console.log("Level completed!");
+    showLevelComplete(); // your UI logic
+    triggerLevelComplete();
+  } else {
+    console.log("⚠ Not all blocks are on goals");
+  }
 }
+
 
 
 function triggerLevelComplete() {
@@ -336,15 +356,47 @@ function showLevelComplete() {
   setTimeout(() => el.classList.remove('show'), 100000);
   setTimeout(() => e.classList.remove('show'), 100000);
 
+  document.getElementById("next").addEventListener("click", handleNextClick);
 }
 
+const handleNextClick =()=>{
+  currentLevel++;
+  resetLevel();
+}
 
 function onClick(event) {
   if (character.isMoving) return;
   character.isMoving = true;
 
   raycaster.setFromCamera(pointer, camera);
-  const intersects = raycaster.intersectObjects(intersectObjects, true);
+
+  const validTiles = intersectObjects.filter(tile => {
+    const tileBox = new THREE.Box3().setFromObject(tile);
+    const tileCenter = new THREE.Vector3();
+    tileBox.getCenter(tileCenter);
+
+    const threshold = 0.3;
+    const heightThreshold = 1.5;
+
+    for (const block of character.group.children) {
+      if (!block.isMesh) continue;
+
+      const blockPos = new THREE.Vector3();
+      block.getWorldPosition(blockPos);
+
+      const dx = Math.abs(tileCenter.x - blockPos.x);
+      const dz = Math.abs(tileCenter.z - blockPos.z);
+      const dy = Math.abs(tileCenter.y - blockPos.y);
+
+      if (dx < threshold && dz < threshold && dy < heightThreshold) {
+        return false; // A block is on this tile, exclude it
+      }
+    }
+
+    return true; // No block above, allow clicking
+  });
+
+  const intersects = raycaster.intersectObjects(validTiles, true);
 
   if (intersects.length === 0) {
     character.isMoving = false;
@@ -508,7 +560,7 @@ function onPointerMove( event ) {
 
 }
 
-loadModel();
+loadModel(currentLevel);
 window.addEventListener("click", onClick);
 window.addEventListener("resize", handleResize);
 window.addEventListener( "pointermove", onPointerMove );
@@ -520,18 +572,40 @@ function animate()
   const intersects = raycaster.intersectObjects( intersectObjects );
 	// calculate objects intersecting the picking ray
 
-  let isHoveringValidTile = false;
-  
-  if(intersects.length>0 && character.group){
+let isHoveringValidTile = false;
 
-    const hoveredTile = intersects[0].object;
+if (intersects.length > 0 && character.group) {
+  const hoveredTile = intersects[0].object;
 
+  // Check if the hovered tile is beneath any block
+  let isBlocked = false;
+  const tileBox = new THREE.Box3().setFromObject(hoveredTile);
+  const tileCenter = new THREE.Vector3();
+  tileBox.getCenter(tileCenter);
+
+  const threshold = 0.3;
+  const heightThreshold = 1.5;
+
+  for (const block of character.group.children) {
+    if (!block.isMesh) continue;
+
+    const blockPos = new THREE.Vector3();
+    block.getWorldPosition(blockPos);
+
+    const dx = Math.abs(tileCenter.x - blockPos.x);
+    const dz = Math.abs(tileCenter.z - blockPos.z);
+    const dy = Math.abs(tileCenter.y - blockPos.y);
+
+    if (dx < threshold && dz < threshold && dy < heightThreshold) {
+      isBlocked = true;
+      break;
+    }
+  }
+
+  if (!isBlocked) {
+    // Now check adjacency like before
     for (const block of [character.instance, character.block001, character.block002]) {
       if (!block || block.parent != character.group) continue;
-
-      const tileBox = new THREE.Box3().setFromObject(hoveredTile);
-      const tileCenter = new THREE.Vector3();
-      tileBox.getCenter(tileCenter);
 
       const blockPos = new THREE.Vector3();
       block.getWorldPosition(blockPos);
@@ -548,10 +622,11 @@ function animate()
         break;
       }
     }
-
   }
+}
 
-  document.body.style.cursor=isHoveringValidTile ? "pointer" : "default";
+document.body.style.cursor = isHoveringValidTile ? "pointer" : "default";
+
 
 	for ( let i = 0; i < intersects.length; i ++ ) {
 

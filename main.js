@@ -34,6 +34,9 @@ let character ={
   instance : null,
   block001: null,
   block002 : null,
+  block003 :null,
+  block004: null,
+  block005: null,
   isMoving :false,
 };
 
@@ -111,6 +114,17 @@ function loadModel(levelNumber){
       if(child.name === "block002"){
         character.block002=child;
       }
+
+      if(child.name === "block003"){
+        character.block003=child;
+      }
+      
+      if(child.name === "block004"){
+        character.block004=child;
+      }
+      if(child.name === "block005"){
+        character.block005=child;
+      }
         
       //console.log(child);
         
@@ -174,6 +188,9 @@ function resetLevel() {
   character.instance = null;
   character.block001 = null;
   character.block002 = null;
+  character.block003 = null;
+  character.block004 = null;
+  character.block005 = null;
   character.isMoving = false;
 
   // 3. Load the model again
@@ -270,7 +287,7 @@ function isAdjacent(tile) {
 }
 
 function checkIfOnGoalTile() {
-  const allBlocks = [character.instance, character.block001, character.block002];
+  const allBlocks = [character.instance, character.block001, character.block002, character.block003, character.block004, character.block005].filter(Boolean);
 
   const notGrouped = allBlocks.filter(b => b && b.parent !== character.group);
   if (notGrouped.length > 0) {
@@ -507,7 +524,7 @@ function onClick(event) {
     character.isMoving = false;
 
     // Block merging logic
-    const allBlocks = [character.instance, character.block001, character.block002];
+    const allBlocks = [character.instance, character.block001, character.block002,character.block003,character.block004, character.block005].filter(Boolean);
     const ungrouped = allBlocks.filter(block => block && block.parent !== character.group);
     const grouped = character.group.children.filter(obj => obj.isMesh);
 
@@ -604,7 +621,7 @@ if (intersects.length > 0 && character.group) {
 
   if (!isBlocked) {
     // Now check adjacency like before
-    for (const block of [character.instance, character.block001, character.block002]) {
+    for (const block of [character.instance, character.block001, character.block002,character.block003, character.block004, character.block005].filter(Boolean)) {
       if (!block || block.parent != character.group) continue;
 
       const blockPos = new THREE.Vector3();

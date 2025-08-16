@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Delius+Unicase:wght@400;700&display=swap');
 
-*{
+* {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
 }
 
-#experience{
+#experience {
   position: fixed;
   height: 100%;
   width: 100%;
@@ -15,13 +15,14 @@
   overflow: hidden;
 }
 
-#experinece-canvas{
+#experinece-canvas {
   width: 100%;
   height: 100%;
 }
 
 canvas {
-  pointer-events: auto; /* or none, depending on your interactivity */
+  pointer-events: auto;
+  /* or none, depending on your interactivity */
   z-index: 1;
   position: absolute;
   top: 0;
@@ -31,9 +32,9 @@ canvas {
 #restart {
   background-color: #c217e8;
   border-radius: 100px;
-  border-style:dashed;
+  border-style: dashed;
   border-width: 2px;
-  box-shadow: rgba(187, 14, 156, 0.519) 0 -25px 30px -30px ,rgba(200, 32, 180, 0.596) 0 1px 1px,rgba(185, 23, 171, 0.667) 0 2px 1px,rgba(171, 25, 149, 0.651) 0 2px 8px,rgba(161, 15, 139, 0.711) 0 8px 16px,rgba(171, 15, 185, 0.716) 0 16px 32px;
+  box-shadow: rgba(187, 14, 156, 0.519) 0 -25px 30px -30px, rgba(200, 32, 180, 0.596) 0 1px 1px, rgba(185, 23, 171, 0.667) 0 2px 1px, rgba(171, 25, 149, 0.651) 0 2px 8px, rgba(161, 15, 139, 0.711) 0 8px 16px, rgba(171, 15, 185, 0.716) 0 16px 32px;
   color: green;
   cursor: pointer;
   display: inline-block;
@@ -54,22 +55,22 @@ canvas {
   transform: scale(1.1) rotate(15deg);
 }
 
-#restart:active{
+#restart:active {
   transform: scale(0.95) rotate(-15deg);
 }
 
-#next{
+#next {
   position: fixed;
   height: 110px;
   width: 200px;
   background: #686D76;
-  top:590px;
+  top: 590px;
   left: 1295px;
   border-radius: 50px;
   z-index: 10;
-  border-style:dashed;
+  border-style: dashed;
   border-width: 2px;
-  box-shadow: rgba(131, 125, 130, 0.519) 0 -25px 30px -15px ,rgba(134, 130, 133, 0.596) 0 1px 25px,rgba(117, 113, 117, 0.667) 0 2px 25px,rgba(130, 126, 129, 0.651) 0 2px 8px,rgba(131, 127, 130, 0.711) 0 8px 16px,rgba(122, 119, 123, 0.716) 0 16px 32px;
+  box-shadow: rgba(131, 125, 130, 0.519) 0 -25px 30px -15px, rgba(134, 130, 133, 0.596) 0 1px 25px, rgba(117, 113, 117, 0.667) 0 2px 25px, rgba(130, 126, 129, 0.651) 0 2px 8px, rgba(131, 127, 130, 0.711) 0 8px 16px, rgba(122, 119, 123, 0.716) 0 16px 32px;
   font-size: 44px;
   color: #B7B7B7;
   transform: translateX(-50%);
@@ -86,7 +87,7 @@ canvas {
   background-color: #c217e8;
   transform: translateX(-50%) scale(1.1);
   cursor: pointer;
-  box-shadow: rgba(187, 14, 156, 0.519) 0 -25px 30px -30px ,rgba(200, 32, 180, 0.596) 0 1px 1px,rgba(185, 23, 171, 0.667) 0 2px 1px,rgba(171, 25, 149, 0.651) 0 2px 8px,rgba(161, 15, 139, 0.711) 0 8px 16px,rgba(171, 15, 185, 0.716) 0 16px 32px;
+  box-shadow: rgba(187, 14, 156, 0.519) 0 -25px 30px -30px, rgba(200, 32, 180, 0.596) 0 1px 1px, rgba(185, 23, 171, 0.667) 0 2px 1px, rgba(171, 25, 149, 0.651) 0 2px 8px, rgba(161, 15, 139, 0.711) 0 8px 16px, rgba(171, 15, 185, 0.716) 0 16px 32px;
   opacity: 1;
   color: black;
   transform: translateX(1%);
@@ -118,7 +119,7 @@ canvas {
   transition: opacity 0.5s ease;
   z-index: 100;
   background: linear-gradient(90deg, #5a0451, #dc26ca, #c806d5);
-  background-clip:text;
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 15px rgba(177, 11, 228, 0.836);
@@ -136,36 +137,141 @@ canvas {
   border-radius: 10px;
   z-index: 10;
   opacity: 0.95;
-  pointer-events: none; /* Prevents mouse interaction */
+  pointer-events: none;
+  /* Prevents mouse interaction */
 }
+
 #border,
-.tut-border{
-    position: absolute;
-    height: 153px;
-    width: 263px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius:10px;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 25px 45px rgba(0,0,0,0.1);
-    border: 1px solid rgba(255, 255, 255, 0.768);
-    border-right: 1px solid rgba(255,255,255,0.2);
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    left: 24px;
-    top: 15px;
-    overflow: hidden;
-    transition: transform 0.6s ease-in-out;
-    color: rgb(238, 233, 239);
-    font-size: 20px;
-    text-align:left;
+.tut-border {
+  position: absolute;
+  height: 153px;
+  width: 263px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.768);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  left: 24px;
+  top: 15px;
+  overflow: hidden;
+  transition: transform 0.6s ease-in-out;
+  color: rgb(238, 233, 239);
+  font-size: 20px;
+  text-align: left;
 }
 
-#tut-text{
-  padding: 20px 20px; 
+#tut-text {
+  padding: 20px 20px;
 }
 
-#border{
+#border {
   opacity: 0;
 }
-#border.show{
+
+#border.show {
   opacity: 1;
+}
+
+#display {
+  position: absolute;
+  width: 230px;
+  height: 380px;
+  left: 1280px;
+  top: 215px;
+  /* box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);*/
+}
+
+#level-text {
+  position: absolute;
+  top: 160px;
+  left: 10px;
+  font-size: 45px;
+  font-weight: 15px;
+  color: rgba(255, 255, 255, 0.985);
+  background: linear-gradient(90deg, #ede9ed, #f0e9f0, #e7e2e8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#level-text-next {
+  position: absolute;
+  top: 20px;
+  left: 47px;
+  font-size: 35px;
+  font-weight: 15px;
+  color: rgba(255, 255, 255, 0.985);
+  background: linear-gradient(90deg, #ede9ed, #f0e9f0, #e7e2e8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#level-text-prev {
+  position: absolute;
+  top: 315px;
+  left: 47px;
+  font-size: 35px;
+  font-weight: 15px;
+  color: rgba(255, 255, 255, 0.985);
+  background: linear-gradient(90deg, #ede9ed, #f0e9f0, #e7e2e8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#glass {
+  position: absolute;
+  height: 75px;
+  width: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.768);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  left: 115px;
+  top: 75px;
+  overflow: hidden;
+  transition: transform 0.6s ease-in-out;
+  color: rgb(238, 233, 239);
+}
+
+#dot2,
+#dot1 {
+  position: absolute;
+  height: 6px;
+  width: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.768);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  left: 114.5px;
+  top: 154.5px;
+  overflow: hidden;
+  transition: transform 0.6s ease-in-out;
+  color: rgb(238, 233, 239);
+  ;
+}
+
+.animate-level {
+  animation: levelAppear 0.6s ease-out forwards;
+}
+
+@keyframes levelAppear {
+  0% {
+    transform: scale(0) translateY(-20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }

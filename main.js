@@ -863,6 +863,14 @@ window.addEventListener("click", onClick);
 window.addEventListener("resize", handleResize);
 window.addEventListener("pointermove", onPointerMove);
 
+function start(){
+  const menu=document.getElementById("experience");
+  menu.style.filter="blur(0px)";
+  document.getElementById("strt_menu").remove();
+}
+
+document.getElementById("play").addEventListener("click", start);
+
 const sphereGeometry = new THREE.SphereGeometry(0.1, 32, 32); // radius 0.2, smoothness
 const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // red color
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);

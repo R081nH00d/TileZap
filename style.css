@@ -13,6 +13,7 @@
   top: 0;
   left: 0;
   overflow: hidden;
+  filter: blur(10px);
 }
 
 #experinece-canvas {
@@ -29,11 +30,12 @@ canvas {
   left: 0;
 }
 
+#play,
 #restart {
   background-color: #c217e8;
   border-radius: 100px;
   border-style: dashed;
-  border-width: 2px;
+  border-width: 32x;
   box-shadow: rgba(187, 14, 156, 0.519) 0 -25px 30px -30px, rgba(200, 32, 180, 0.596) 0 1px 1px, rgba(185, 23, 171, 0.667) 0 2px 1px, rgba(171, 25, 149, 0.651) 0 2px 8px, rgba(161, 15, 139, 0.711) 0 8px 16px, rgba(171, 15, 185, 0.716) 0 16px 32px;
   color: green;
   cursor: pointer;
@@ -57,6 +59,13 @@ canvas {
 
 #restart:active {
   transform: scale(0.95) rotate(-15deg);
+}
+
+#play:hover{
+  transform: scale(1.1);
+}
+#play:active{
+  transform: scale(0.95);
 }
 
 #next {
@@ -104,7 +113,7 @@ canvas {
   font-weight: 200;
   font-style: normal;
 }
-
+#strt,
 #levelComplete {
   position: absolute;
   top: 15%;

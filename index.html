@@ -14,12 +14,33 @@
   <div id="experience">
     <canvas id="experience-canvas"></canvas>
   </div>
+  
+  <div class="tut-border">
+    <video id="tut-video" src="./demo/tut1.mp4" autoplay muted loop></video>
+  </div>
 
-  <div id="strt_menu" style="height: 600px; width: 1000px; position: absolute;left:300px; top:100px;">
+  <div class="tut-border" style="position: absolute; top: 175px; height: 135px;">
+    <p id="tut-text" class="delius-unicase-regular"></p>
+  </div>
+
+  <div class="tut-border" id="timer" style="position: absolute; top: 15px; left:295px; height: 108px; width: 200px;"><p style="font-size: 25px; position: absolute; left: 10px; top:10px; font-weight: 300;"><b>Time</b></p><p id="view_time">00:00</p></div>
+  <div class="tut-border" id="score" style="position: absolute; top: 130px; height: 105px; left:295px; width: 200px "><p style="font-size: 25px; position: absolute; left: 10px; top:10px; font-weight: 300;">Score</p><p id="plus10" style="position: absolute; left:105px; font-size: 45px; opacity: 0;">+10</p><p id="view_score" style="font-size: 60px;">00000</p></div>
+  <div class="main-container">
+    <div class="tut-border leaderboard-box">
+        <p class="leaderboard-title">Score Board</p>
+        <div class="boardholder"></div>
+    </div>
+  </div>
+
+  <div class="tut-border" id="userinfo" style="position: absolute; left:1000px;top:30px; height:75px; width:300px">
+
+  </div>
+  
+  <div id="strt_menu" >
     <p class="delius-unicase-bold" style="text-align: center; font-size: 150px;   background: linear-gradient(90deg, #4e2350, #c132ba, #320133);background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;  -webkit-text-stroke: 3px black;">TileZap</p>
-    <button id="play" role="button" style="position: absolute; top: 250px; left: 385px; width: 150px; height: 150px;">
+    <button id="play" role="button" style="position: absolute; top: 280px; left: 435px; width: 150px; height: 150px;">
       <svg width="156px" height="156px" viewBox="-0.56 -0.56 655.12 605.12" xmlns="http://www.w3.org/2000/svg"
         fill="#000000" stroke="#000000" stroke-width="2.56" transform="rotate(0)">
         <g id="SVGRepo_bgCarrier" stroke-width="0"
@@ -37,9 +58,21 @@
         </g>
       </svg>
     </button>
+    <div id="login">
+        <button id="signin" role="button"><i><p style="color: rgba(0, 0, 0, 0.755); font-size: 40px;">Sign In</p></i></button>
+        <button id="regin" role="button" style="left: 325px;"><i><p style="color: rgba(0, 0, 0, 0.753); font-size: 40px;">Register</p></i></button>
+        <input id="1stinput" type="email" placeholder="E-mail" class="transparent-box">
+        <div id="login_glass"></div>
+        <input id="2ndinput" type="password" placeholder="Password" class="transparent-box" style="top:333px">
+        <div id="login_glass2" style="top: 400px;"></div>
+        <input id="3rdinput" type="text" placeholder="Username" class="transparent-box" style="top:373px; display: none;">
+        <div id="login_glass3" style="top: 440px; display: none;"></div>
+        <button id="contin" role="button" style="left: 185px; top:460px"><i><p style="color: white; font-size: 40px;">Continue</p></i></button>
+        <button id="resendCodeBtn" style="top:520px; position:absolute; display:none;">Resend Code</button>
+    </div>
   </div>
 
-
+ <button class="reload" style="position: absolute; left:1200px; top:111px;" onClick="location.reload()">Sign off</button>
   <button id="restart" role="button">
     <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="1 4 1 10 7 10" />
@@ -58,19 +91,11 @@
     </p>
   </button>
 
-  <div id="border" style="position: absolute; left:530px; width: 625px; top:58px; height: 114px;"></div>
+  <div id="border" style="position: absolute; left:530px; width: 625px; top:88px; height: 114px;"></div>
   <div id="levelComplete">
-    <p class="delius-unicase-bold">Level Complete!</p>
+    <p class="delius-unicase-bold">Level Cleared!!</p>
   </div>
 
-
-  <div class="tut-border">
-    <video id="tut-video" src="./demo/tut1.mp4" autoplay muted loop></video>
-  </div>
-
-  <div class="tut-border" style="position: absolute; top: 175px; height: 135px;">
-    <p id="tut-text" class="delius-unicase-regular"></p>
-  </div>
   <div id="display">
     <div id="dot2" style="position: absolute; top: 65px"></div>
     <div id="glass"></div>
@@ -106,6 +131,7 @@
       }
     }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.6/dist/amazon-cognito-identity.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="./main.js"></script>
 

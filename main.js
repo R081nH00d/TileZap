@@ -10,7 +10,14 @@ const tutSteps = [
   "5. If stuck, click restart to try again.",
 ];
 
-let currentLevel = 0;
+const poolData = {
+  UserPoolId: "us-east-1_2kmFZ9tyM",
+  ClientId: "635ce68se1v24q7gdu4a018e18"
+};
+
+const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData); 
+
+let currentLevel = 1;
 let currentStep = -1;
 const tut_text = document.getElementById("tut-text");
 
@@ -67,6 +74,63 @@ camera.position.x = 8.244763772420455;
 camera.position.y = 8.4372715754375;
 camera.position.z = 9.358217661513395;
 const loader = new GLTFLoader();
+
+let seconds = 0;
+let timer = null;
+
+function updateDisplay() {
+  let mins = Math.floor(seconds / 60);
+  let secs = seconds % 60;
+
+  document.getElementById("view_time").innerText =
+    (mins < 10 ? "0" : "") + mins + ":" +
+    (secs < 10 ? "0" : "") + secs;
+}
+
+function time_start() {
+  if (timer) return;
+
+  timer = setInterval(() => {
+    seconds++;
+    updateDisplay();
+  }, 1000);
+}
+
+function stop() {
+  clearInterval(timer);
+  timer = null;
+}
+
+function reset() {
+  stop();
+  seconds = 0;
+  updateDisplay();
+}
+
+let score = 0;
+
+function addScore() {
+  score += 10;
+
+  // update score display (5 digits)
+  document.getElementById("view_score").innerText =
+    score.toString().padStart(5, '0');
+
+  // show +10
+  let plus = document.getElementById("plus10");
+  plus.style.opacity = 1;
+  plus.style.transform = "translateY(-20px)";
+
+  setTimeout(() => {
+    plus.style.opacity = 0;
+    plus.style.transform = "translateY(0)";
+  }, 500);
+}
+
+function resetScore() {
+  score = 0;
+  document.getElementById("view_score").innerText = score.toString().padStart(5, '0');
+}
 
 function loadModelTile(levelNumber) {
 
@@ -189,6 +253,7 @@ scene.add(pivotGroup);
 
 
 function resetLevel() {
+  resetScore();
   // 1. Remove all objects from scene that are part of the level
   const toRemove = [];
   scene.traverse((child) => {
@@ -424,14 +489,42 @@ function checkIfOnGoalTile() {
   }
 
   if (matchedGoals === placedBlocks.length) {
-    console.log("Level completed!");
+    console.log("Level cleared!!");
     showLevelComplete();
     triggerLevelComplete();
+    stop();
   } else {
     console.log("Not all blocks are on goals");
   }
 }
 
+function saveLevelData(level, score, time) {
+  if (!currentUser) return;
+
+  let rlevl = level+1;
+
+  fetch("https://2z23po4yq4.execute-api.us-east-1.amazonaws.com/prod/saveGameData", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userId: currentUser.userId,
+      username: currentUser.username,
+      profilePic: currentUser.profilePic,
+      totalScore: score,
+      levelReached: rlevl,
+      levels: [{
+        level: level ?? 1,
+        score: score ?? 10,
+        time: time ?? 10
+      }]
+    })
+  })
+  .then(res => res.json())
+  .then(data => console.log("Saved:", data))
+  .catch(err => console.error(err));
+}
 
 
 function triggerLevelComplete() {
@@ -446,6 +539,11 @@ function triggerLevelComplete() {
     origin: { x: 0.5, y: 0.5 },
     colors: ['#bb0000', '#ffffff']
   });
+
+  //const level;
+ // const score;
+
+  saveLevelData(currentLevel, score, seconds);
 }
 
 function showLevelComplete() {
@@ -464,10 +562,17 @@ function showLevelComplete() {
 
 const handleNextClick = () => {
   currentLevel++;
+  currentUser.totalScore += score;
+  const tscore = document.querySelector(".user-score");
+  tscore.innerHTML = `Score: ${currentUser.totalScore}`;
+  reset();
   resetLevel();
+  resetScore();
   showLevel(currentLevel);
   showLevelnext(currentLevel);
   showLevelprev(currentLevel);
+  leaderboard(currentLevel);
+  renderUserInfo()
 }
 
 function barrier(pivotPos, dx, dz) {
@@ -710,6 +815,7 @@ function onClick(event) {
   rotationTween[flipAxis] = "-=" + Math.PI;
 
   timeline.to(pivotGroup.rotation, {
+    onStart: addScore, time_start,
     ...rotationTween,
     duration: 0.65,
     ease: "power1.inOut"
@@ -863,10 +969,302 @@ window.addEventListener("click", onClick);
 window.addEventListener("resize", handleResize);
 window.addEventListener("pointermove", onPointerMove);
 
+let currentUser = null;
+
+
+if(localStorage.getItem("token")){
+  document.getElementById("login").style.display = "none"
+  document.getElementById("experience").style.display = "block"
+}
+
+document.getElementById("resendCodeBtn").addEventListener("click", resendCode)
+
+function resendCode(){
+
+  const email = document.getElementById("3rdinput").value
+
+  const userData = {
+    Username: email,
+    Pool: userPool
+  };
+
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+  cognitoUser.resendConfirmationCode(function(err, result) {
+    if (err) {
+      alert(err.message)
+      return
+    }
+
+    alert("New verification code sent to email!")
+    confirmUser();
+  });
+}
+
+function confirmUser(){
+
+  const email = document.getElementById("1stinput").value
+  const code = prompt("Enter NEW verification code from email:")
+
+  const userData = {
+    Username: email,
+    Pool: userPool
+  };
+
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+  cognitoUser.confirmRegistration(code, true, function(err, result) {
+    if (err) {
+      alert(err.message)
+      return
+    }
+
+    alert("Account confirmed! Now login.")
+  });
+}
+
+function registerUser(){
+  const email = document.getElementById("1stinput").value;
+  const password = document.getElementById("2ndinput").value;
+  const username = document.getElementById("3rdinput").value;
+
+  if (!email || !password || !username) {
+    alert("Please enter all fields.");
+    return;
+  }
+
+  const attributeList =[];
+
+  const dataUsername = {
+    Name: "name",
+    Value: username
+  };
+
+  const attributeUsername = new AmazonCognitoIdentity.CognitoUserAttribute(dataUsername);
+  attributeList.push(attributeUsername);
+
+
+  userPool.signUp(email, password,attributeList, null, (err, result) => {
+    if (err) {
+      console.error("Error during sign up:", err);
+      alert(err.message || JSON.stringify(err));
+      return;
+    }
+    alert("Registration successful!");
+    confirmUser();
+  });
+}
+
+function signInUser() {
+
+  const email = document.getElementById("1stinput").value;
+  const password = document.getElementById("2ndinput").value;
+
+  if (!email || !password) {
+    alert("Please enter both email and password.");
+    return;
+  }
+
+  const authDeatails = new AmazonCognitoIdentity.AuthenticationDetails({
+    Username: email,
+    Password: password,
+  });
+
+  const userData = {
+    Username: email,
+    Pool: userPool,
+  };  
+
+  const congnitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+  congnitoUser.authenticateUser(authDeatails, {
+    onSuccess: (result) => {
+      const token = result.getAccessToken().getJwtToken();
+      localStorage.setItem("token", token);
+
+      const Pic=[
+        "https://tilezap-avatars.s3.us-east-1.amazonaws.com/face5.png",
+        "https://tilezap-avatars.s3.us-east-1.amazonaws.com/face6.png",
+        "https://tilezap-avatars.s3.us-east-1.amazonaws.com/face7.png",
+        "https://tilezap-avatars.s3.us-east-1.amazonaws.com/face8.png",
+        "https://tilezap-avatars.s3.us-east-1.amazonaws.com/face9.png",
+        "https://tilezap-avatars.s3.us-east-1.amazonaws.com/face10.png",
+      ];
+      
+      currentUser = {
+        userId: result.getIdToken().payload.sub,
+        username: result.getIdToken().payload.name,
+        email: result.getIdToken().payload.email,
+        profilePic: Pic[Math.floor(Math.random() * Pic.length)]
+      };
+
+      if(pchecker==2){  
+        saveLevelData(currentLevel, score, seconds);
+      }
+
+      fetch(`https://40nsk06qdj.execute-api.us-east-1.amazonaws.com/prod/getUserData?userId=${currentUser.userId}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("User Data:", data);
+
+        if (data.levelReached !== undefined) {
+          currentLevel = data.levelReached;   // 🔥 RESUME HERE
+        }
+
+        currentUser.profilePic = data.profilePic || currentUser.profilePic;
+        currentUser.totalScore = data.totalScore || 0;  
+
+        /* Optional: restore score
+        if (data.totalScore) {
+          score = data.totalScore;
+        }*/
+        console.log("Current Level:", currentLevel);
+        //loadModelTile(currentLevel);
+        resetLevel();
+        showLevel(currentLevel);
+        showLevelnext(currentLevel);
+        showLevelprev(currentLevel);
+        leaderboard(currentLevel); 
+        renderUserInfo();
+      });
+      
+      console.log("Logged in:", currentUser);
+      const menu=document.getElementById("experience");
+      menu.style.filter="blur(0px)";
+      document.getElementById("strt_menu").remove(); 
+      alert("Login successful!");
+    },
+    onFailure: (err) => {
+      console.error("Error during sign in:", err);
+      alert(err.message || JSON.stringify(err));
+    },
+  });
+}
+
+function renderUserInfo() {
+  const userblock = document.getElementById("userinfo");
+  userblock.innerHTML = "";
+
+  const row = document.createElement("div");
+  row.className = "boardholder-row";
+
+  row.innerHTML = `
+    <img src="${currentUser.profilePic}" class="avatar"/>
+    <div class="name">${currentUser.username}</div>
+    <div class="user-score" style="text-align: center;"> Score: ${currentUser.totalScore}</div>
+  `;
+  row.style.marginTop = "5px";
+  userblock.appendChild(row);
+}
+
+function renderLeaderboard(data) {
+  const container = document.querySelector(".boardholder");
+
+  // clear old data
+  container.innerHTML = "";
+
+  data.forEach((player, index) => {
+    const row = document.createElement("div");
+    row.className = "boardholder-row";
+
+    row.innerHTML = `
+      <div class="rank">${index + 1}</div>
+      <img class="avatar" src="${player.profilePic}" alt="./default.png"/>
+      <div class="name">${player.username}</div>
+      <div class="score">${player.score}</div>
+      <div class="time">${player.time}s</div>
+    `;
+
+    container.appendChild(row);
+  });
+}
+
+function leaderboard(currentLevel){
+  console.log("Currentleeevel:", currentLevel);
+  fetch(`https://jll9x4anga.execute-api.us-east-1.amazonaws.com/prod/leaderboard?level=${currentLevel}`)
+  .then(res => res.json())
+  .then(data => {
+    console.log("Leaderboard:", data);
+      renderLeaderboard(data);
+  });
+}
+
+let pchecker=1;
+
 function start(){
-  const menu=document.getElementById("experience");
-  menu.style.filter="blur(0px)";
-  document.getElementById("strt_menu").remove();
+  
+  let checker=1;
+
+  const play_button=document.getElementById("play");
+  play_button.style.display="none";
+  const login=document.getElementById("login");
+  login.style.display="flex";
+
+  let sigInButton=document.getElementById("signin");
+  let regInButton=document.getElementById("regin");
+  regInButton.addEventListener("click",()=>{
+
+    checker=2;
+    pchecker=2;
+
+    regInButton.style.background="rgba(194, 9, 147, 0.3)";
+    sigInButton.style.background="rgba(255, 255, 255, 0.3)";
+    const pass=document.getElementById("2ndinput"); 
+    const matt=document.getElementById("login_glass2");
+    gsap.to(pass, {
+      y:-50,
+      duration: 0.5,
+    });
+
+    gsap.to(matt, {
+      y:-50,
+      duration: 0.002,
+    }); 
+
+    setTimeout(() => {
+      document.getElementById("3rdinput").style.display="flex";
+      document.getElementById("login_glass3").style.display="flex";
+    }, 400);
+    
+    
+  });
+
+  
+  sigInButton.addEventListener("click",()=>{
+
+    checker=1;
+
+    regInButton.style.background="rgba(255, 255, 255, 0.3)";
+    sigInButton.style.background="rgba(194, 9, 147, 0.3)";
+    const pass=document.getElementById("2ndinput");
+    const matt=document.getElementById("login_glass2");
+    gsap.to(pass, {
+      y:0,
+      duration: 0.5,
+    });
+    gsap.to(matt, {
+      y:0,
+      duration: 0.002,
+    });
+    
+    document.getElementById("3rdinput").style.display="none";
+    document.getElementById("login_glass3").style.display="none";
+  });
+
+  let continueButton=document.getElementById("contin");
+  continueButton.addEventListener("click",()=>{
+   /* const menu=document.getElementById("experience");
+    menu.style.filter="blur(0px)";
+    document.getElementById("strt_menu").remove();
+    */
+
+    if(checker==1){
+      signInUser();
+    }else if(checker==2){
+      registerUser();
+    }
+
+  });
+
 }
 
 document.getElementById("play").addEventListener("click", start);
@@ -951,12 +1349,12 @@ function animate() {
   document.body.style.cursor = isHoveringValidTile ? "pointer" : "default";
 
 
-  for (let i = 0; i < intersects.length; i++) {
+  //for (let i = 0; i < intersects.length; i++) {
 
     //console.log(intersects[0].object.name);
     //console.log("Hit:", intersects[0].object.name, "| Parent:", intersects[0].object.parent?.name);
 
-  }
+  //}
 
   renderer.render(scene, camera);
 }
